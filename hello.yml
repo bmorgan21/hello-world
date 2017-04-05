@@ -1,0 +1,31 @@
+version: '2.0'
+
+services:
+  db:
+    image: mysql:5.7.17
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: hw_app
+      MYSQL_USER: web_user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./mysql/general.cnf:/etc/mysql/conf.d/general.cnf:ro
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/1.sql
+
+  web:
+    image: hello/hello:default
+    command: /dev-server.sh
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+    environment:
+      CELERY_TASK_ALWAYS_EAGER: 1
+      FLASK_APP: app/main.py
+      FLASK_DEBUG: 1
+      SESSION_MAX_AGE: 259200
+      TEMPLATES_AUTO_RELOAD: 1
+    volumes:
+      - ./hello:/var/code
+    ports:
+      - "127.0.0.1:8080:5000"

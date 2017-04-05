@@ -1,0 +1,36 @@
+{% from "_formhelpers.html" import render_field %}
+
+{% extends 'inline_modal.html' %}
+{% block title %}Login{% endblock %}
+{% block header %}Login{% endblock %}
+{% block content %}
+<div>
+    {% for (i, user, is_impersonating, fresh) in known_users %}
+    {% set is_staff = user.is_staff or is_impersonating %}
+    <div class="dropdown-item {% if is_current %}bg-faded{% endif %}">
+        <a href="{{ context_url(form.next.data, i) }}">
+            {% if is_impersonating %}<i class="fa fa-user-secret"></i>{% elif is_staff %}<i class="fa fa-bolt"></i>{% else %}<i class="fa fa-user-circle"></i>{% endif %}
+            {{ user.full_name }}<br/>
+            <small>{{ user.email }}</small><br/>
+        </a>
+    </div>
+    {% if not loop.last %}
+    <div class="dropdown-divider"></div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    <div class="actions">
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </div>
+    <div class="footer text-center">
+        <a class="link" href="{{ url_for('auth.signup') }}">Don't have an account?</a>
+        <br>
+        <a class="link" href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a>
+    </div>
+</form>
+{% endblock %}

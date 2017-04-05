@@ -1,0 +1,11 @@
+{% macro render_field(field, checkbox_right=False) %}
+<div class="form-group">
+    {% if field.label.text %}{{ field.label }}{% endif %}
+    {{ field(required=field.flags.required, class_="form-control", **kwargs )|safe }}
+    <span class="help-block">
+        {% for error in field.errors %}
+        <span class="form-control-feedback text-danger">{{ error }}</span>
+        {% endfor %}
+    </span>
+</div>
+{% endmacro %}

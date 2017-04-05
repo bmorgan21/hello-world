@@ -1,0 +1,37 @@
+version: '2.1'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.6.8
+    ports:
+      - "127.0.0.1:5672:5672"
+
+  web:
+    depends_on:
+      - rabbitmq
+    environment:
+      CELERY_TASK_ALWAYS_EAGER: 0
+
+  celery-worker:
+    image: hello/hello:${HELLO_TAG:-latest}
+    command: celery-worker
+    depends_on:
+      - rabbitmq
+    environment:
+      FLASK_APP: app/main.py
+      FLASK_DEBUG: 1
+    restart: unless-stopped
+    volumes:
+      - ./hello:/var/code
+
+  celery-beat:
+    image: hello/hello:${HELLO_TAG:-latest}
+    command: celery-beat
+    depends_on:
+      - rabbitmq
+    environment:
+      FLASK_APP: app/main.py
+      FLASK_DEBUG: 1
+    restart: unless-stopped
+    volumes:
+      - ./hello:/var/code
